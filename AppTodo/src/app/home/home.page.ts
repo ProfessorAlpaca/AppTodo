@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { ToastController } from '@ionic/angular';
 import { ActionSheetController } from '@ionic/angular';
+import { TodoService } from '../services/todo.service';
 
 @Component({
   selector: 'app-home',
@@ -10,7 +11,10 @@ import { ActionSheetController } from '@ionic/angular';
 })
 export class HomePage {
 
-  constructor(private alertCrtl: AlertController, private toastCtrl: ToastController, private actionSheetCrtl: ActionSheetController) { }
+  constructor(private alertCrtl: AlertController, private toastCtrl: ToastController, private actionSheetCrtl: ActionSheetController, private todoService: TodoService) {
+
+    this.carregarTarefa();
+   }
 
   tarefas: any[] = [];
 
@@ -89,29 +93,48 @@ export class HomePage {
       return;
     } 
 
-    const tarefa = {nome:novaTarefa, realizada: false};
+    const tarefa = {nome:novaTarefa, realizada: 0};
 
     this.tarefas.push(tarefa);
 
-    this.salvaLocalStorage();
+    this.todoService.adicionaTarefa(tarefa.nome, tarefa.realizada)
+    .then( async(resposta)=>{
+      const toast = await this.toastCtrl.create({
+        message: 'Operação Realizada com Sucesso!',
+        duration: 2000,
+        position: 'top'
+      });
+      toast.present();
 
-  } 
+      this.carregarTarefa();
+    })
+    .catch(async(erro)=>{
+      const toast = await this.toastCtrl.create({
+        message: 'Erro ao realizar operação!',
+        duration: 2000,
+        position: 'top'
+      });
+      toast.present(); });
 
-  salvaLocalStorage(){
+    }
+
+    salvaLocalStorage() {
       localStorage.setItem('tarefaUsuario', JSON.stringify(this.tarefas));
-
-   let tarefaSalva = localStorage.getItem('tarefaUsuario');
-
-      if (tarefaSalva != null) {
-        this.tarefas = JSON.parse(tarefaSalva);
-      }
-    
-  }
-
-  excluirTarefa(tarefa: any){
-    this.tarefas = this.tarefas.filter(arrayTarefa => tarefa != arrayTarefa);
-
-    this.salvaLocalStorage();
+    }
+      
+  carregarTarefa(){
+    this.todoService.listaTarefa()
+    .then( async(resposta: any[])=>{
+      console.table(resposta);
+      this.tarefas = resposta;
+    })
+    .catch(async(erro)=>{
+      const toast = await this.toastCtrl.create({
+        message: 'Erro ao realizar operação!',
+        duration: 2000,
+        position: 'top'
+      });
+      toast.present(); });
   }
 
 
