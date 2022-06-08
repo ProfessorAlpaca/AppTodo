@@ -76,7 +76,7 @@ export class HomePage {
 
   }
 
-  async adicionaTarefa (novaTarefa: string) {
+  async adicionarTarefa (novaTarefa: string) {
 
     if (novaTarefa.trim().length < 1) {
 
@@ -105,7 +105,7 @@ export class HomePage {
         position: 'top'
       });
       toast.present();
-
+      
       this.carregarTarefa();
     })
     .catch(async(erro)=>{
@@ -130,7 +130,7 @@ export class HomePage {
     })
     .catch(async(erro)=>{
       const toast = await this.toastCtrl.create({
-        message: 'Erro ao realizar operação!',
+        message: 'Bop Bop',
         duration: 2000,
         position: 'top'
       });
